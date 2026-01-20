@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>موقعي البسيط</title>
+    <style>
+        body { font-family: sans-serif; text-align: center; padding: 50px; background-color: #f4f4f4; }
+        .card { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); display: inline-block; }
+        input { padding: 10px; margin: 10px; border: 1px solid #ccc; border-radius: 5px; }
+        button { padding: 10px 20px; background-color: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <h2>أهلاً بك في موقعي 🚀</h2>
+        <p>اكتب اسمك تحت وشوف وش يصير:</p>
+        <input type="text" id="userName" placeholder="اكتب اسمك هنا...">
+        <br>
+        <button onclick="showMessage()">اضغط هنا</button>
+        <h3 id="result"></h3>
+    </div>
+
+    <script>
+        function showMessage() {
+            let name = document.getElementById("userName").value;
+            if (name) {
+                document.getElementById("result").innerText = "يا هلا والله بـ " + name + "! تم استلام بياناتك بنجاح ✅";
+            } else {
+                alert("تكفى اكتب اسمك أول 😂");
+            }
+        }
+    </script>
+</body>
+</html>
