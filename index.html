@@ -183,9 +183,14 @@
     function processData() {
         const now = new Date();
         
-        // استخدام en-GB لضمان الأرقام الإنجليزية 123456
+        // دالة لتحويل AM/PM إلى ص/م مع بقاء الأرقام إنجليزية
+        const formatTimeAr = (date) => {
+            let timeStr = date.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: true });
+            return timeStr.replace(/am/gi, 'ص').replace(/pm/gi, 'م');
+        };
+
         const startD = now.toLocaleDateString('en-GB');
-        const startT = now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: true });
+        const startT = formatTimeAr(now);
 
         let finalMsg = "";
 
@@ -196,7 +201,7 @@
             
             const endDate = new Date(now.getTime() + (h * 60 * 60 * 1000));
             const endD = endDate.toLocaleDateString('en-GB');
-            const endT = endDate.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: true });
+            const endT = formatTimeAr(endDate);
 
             finalMsg = `﷽\n\n***الموضوع : إجازة داخلية***\n\n***للمسعف :*** <@${id}>\n\n***\`المــــدة :\`*** ***${h} ساعة***\n\n***\`الرصيد المتبقي :\`*** ***${r - h} ساعة***\n\n\n***من الساعة : ${startT} | ${startD}***\n***إلى الساعة : ${endT} | ${endD}***\n\n ***[يرجى قراءه القوانين قبل تغيير الوظيفة](https://discord.com/channels/1404512396923375696/1404536315537526794/1463297047552725252)*** \n\n***إعتماد : <@&1404535885864632340>***`;
         } else if (currentSection === 'resignation') {
