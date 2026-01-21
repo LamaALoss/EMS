@@ -171,6 +171,17 @@
                 </div>
             </div>
 
+            <div id="ext-vacation" class="form-section">
+                <div class="form-group">
+                    <label>أدخل Copy ID للمسعف:</label>
+                    <input type="text" id="copyID_ext" placeholder="123456789">
+                </div>
+                <div class="form-group">
+                    <label>مدة الإجازة (بالأيام):</label>
+                    <input type="number" id="days_ext" placeholder="مثلاً: 14">
+                </div>
+            </div>
+
             <div class="action-btns">
                 <button class="btn-main btn-gen" onclick="processData()">إنشاء القرار</button>
                 <button class="btn-main btn-copy" onclick="copyResult()">نسخ القرار</button>
@@ -181,7 +192,10 @@
     </div>
 
 <script>
+    let currentSection = 'vacation';
+
     function showSection(sectionId) {
+        currentSection = sectionId;
         document.querySelectorAll('.form-section').forEach(s => s.classList.remove('active'));
         const target = document.getElementById(sectionId);
         if(target) target.classList.add('active');
@@ -190,7 +204,7 @@
         document.getElementById('output').style.display = 'none';
         
         const titles = {
-            'vacation': 'الشؤون الإدارية - الإجازة',
+            'vacation': 'الشؤون الإدارية - الإجازة الداخلية',
             'resignation': 'الشؤون الإدارية - الاستقالة',
             'transfer': 'الشؤون الإدارية - الانتداب',
             'ext-vacation': 'الشؤون الإدارية - إجازة خارجية',
@@ -201,40 +215,65 @@
     }
 
     function processData() {
-        const startTime = new Date(); // يأخذ تاريخ اليوم تلقائياً
-        const h = parseInt(document.getElementById('manualHour').value);
-        const m = parseInt(document.getElementById('manualMin').value);
-        const period = document.getElementById('manualPeriod').value;
+        let finalMsg = "";
+        const now = new Date();
 
-        if (isNaN(h) || isNaN(m)) return alert("يرجى إدخال الساعة والدقيقة");
+        if (currentSection === 'vacation') {
+            const h = parseInt(document.getElementById('manualHour').value);
+            const m = parseInt(document.getElementById('manualMin').value);
+            const period = document.getElementById('manualPeriod').value;
 
-        let h24 = h;
-        if (period === 'PM' && h < 12) h24 += 12;
-        if (period === 'AM' && h === 12) h24 = 0;
+            if (isNaN(h) || isNaN(m)) return alert("يرجى إدخال الساعة والدقيقة");
 
-        startTime.setHours(h24, m, 0);
+            let h24 = h;
+            if (period === 'PM' && h < 12) h24 += 12;
+            if (period === 'AM' && h === 12) h24 = 0;
 
-        const formatTimeAr = (date) => {
-            let timeStr = date.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: true });
-            return timeStr.replace(/am/gi, 'ص').replace(/pm/gi, 'م');
-        };
+            const startTime = new Date();
+            startTime.setHours(h24, m, 0);
 
-        const startD = startTime.toLocaleDateString('en-GB');
-        const startT = formatTimeAr(startTime);
+            const formatTimeAr = (date) => {
+                let timeStr = date.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: true });
+                return timeStr.replace(/am/gi, 'ص').replace(/pm/gi, 'م');
+            };
 
-        const id = document.getElementById('copyID').value;
-        const duration = parseFloat(document.getElementById('hours').value) || 0;
-        const remain = parseFloat(document.getElementById('remain').value) || 0;
-        
-        const endDate = new Date(startTime.getTime() + (duration * 60 * 60 * 1000));
-        const endD = endDate.toLocaleDateString('en-GB');
-        const endT = formatTimeAr(endDate);
+            const startD = startTime.toLocaleDateString('en-GB');
+            const startT = formatTimeAr(startTime);
 
-        const finalMsg = `﷽\n\n***الموضوع : إجازة داخلية***\n\n***للمسعف :*** <@${id}>\n\n***\`المــــدة :\`*** ***${duration} ساعة***\n\n***\`الرصيد المتبقي :\`*** ***${remain - duration} ساعة***\n\n\n***من الساعة : ${startT} | ${startD}***\n***إلى الساعة : ${endT} | ${endD}***\n\n ***[يرجى قراءه القوانين قبل تغيير الوظيفة](https://discord.com/channels/1404512396923375696/1404536315537526794/1463297047552725252)*** \n\n***إعتماد : <@&1404535885864632340>***`;
+            const id = document.getElementById('copyID').value;
+            const duration = parseFloat(document.getElementById('hours').value) || 0;
+            const remain = parseFloat(document.getElementById('remain').value) || 0;
+            
+            const endDate = new Date(startTime.getTime() + (duration * 60 * 60 * 1000));
+            const endD = endDate.toLocaleDateString('en-GB');
+            const endT = formatTimeAr(endDate);
+
+            finalMsg = `﷽\n\n***الموضوع : إجازة داخلية***\n\n***للمسعف :*** <@${id}>\n\n***\`المــــدة :\`*** ***${duration} ساعة***\n\n***\`الرصيد المتبقي :\`*** ***${remain - duration} ساعة***\n\n\n***من الساعة : ${startT} | ${startD}***\n***إلى الساعة : ${endT} | ${endD}***\n\n ***[يرجى قراءه القوانين قبل تغيير الوظيفة](https://discord.com/channels/1404512396923375696/1404536315537526794/1463297047552725252)*** \n\n***إعتماد : <@&1404535885864632340>***`;
+
+        } else if (currentSection === 'ext-vacation') {
+            const id = document.getElementById('copyID_ext').value;
+            const days = parseInt(document.getElementById('days_ext').value) || 0;
+            
+            if (!id) return alert("يرجى إدخال ID المسعف");
+
+            const startDate = new Date(); // تاريخ اليوم (يوم إنشاء القرار)
+            const endDate = new Date();
+            endDate.setDate(startDate.getDate() + days);
+
+            // تنسيق التاريخ YYYY/MM/DD
+            const fmt = (d) => {
+                const y = d.getFullYear();
+                const m = String(d.getMonth() + 1).padStart(2, '0');
+                const day = String(d.getDate()).padStart(2, '0');
+                return `${y}/${m}/${day}`;
+            };
+
+            finalMsg = `﷽\n\n***الموضوع : إجازة خارجية***\n\n*** للمسعف المحترم :*** <@${id}>\n\n***\`المــــدة :\`*** *** ${days} يوم***\n\n***من تاريخ : ${fmt(startDate)}***\n***إلى تاريخ : ${fmt(endDate)}***\n\n***[يرجى قراءه القوانين قبل اخذ اجازه خارجية](https://discord.com/channels/1404512396923375696/1404536315537526794/1463297471760568421)***\n\n***إعتماد : <@&1404535885864632340>***`;
+        }
 
         const out = document.getElementById('output');
         out.innerText = finalMsg;
-        out.style.display = 'block';
+        out.style.display = finalMsg ? 'block' : 'none';
     }
 
     function copyResult() {
