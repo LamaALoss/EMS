@@ -26,7 +26,6 @@
             padding: 20px;
         }
 
-        /* شريط التنقل العلوي (الأزرار) */
         .nav-bar {
             display: flex;
             flex-wrap: wrap;
@@ -76,7 +75,7 @@
         .form-group { margin-bottom: 15px; }
         label { display: block; margin-bottom: 5px; font-size: 0.9rem; color: #ccc; }
         
-        input, select, textarea {
+        input, textarea {
             width: 100%;
             padding: 12px;
             background: rgba(255, 255, 255, 0.1);
@@ -85,10 +84,7 @@
             color: #fff;
             box-sizing: border-box;
             outline: none;
-            font-family: inherit;
         }
-
-        input:focus { border-color: var(--red-dark); }
 
         .btns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 25px; }
         
@@ -125,7 +121,6 @@
         <button class="nav-btn" onclick="showSection('resignation')">الاستقالة</button>
         <button class="nav-btn" onclick="showSection('transfer')">نموذج الانتداب</button>
         <button class="nav-btn" onclick="showSection('roles')">طلب الرولات</button>
-        <button class="nav-btn" onclick="showSection('templates')">نماذج التكتات</button>
     </div>
 
     <div class="container">
@@ -157,17 +152,6 @@
             </div>
         </div>
 
-        <div id="templates" class="form-section">
-            <div class="form-group">
-                <label>اختر نوع التكت:</label>
-                <select id="ticketType">
-                    <option value="طلب دعم فني">طلب دعم فني</option>
-                    <option value="شكوى إدارية">شكوى إدارية</option>
-                    <option value="تعديل بيانات">تعديل بيانات</option>
-                </select>
-            </div>
-        </div>
-
         <div class="btns">
             <button class="action-btn btn-gen" onclick="processData()">إنشاء الصيغة ✨</button>
             <button class="action-btn btn-copy" onclick="copyResult()">نسخ النتيجة 📋</button>
@@ -177,42 +161,46 @@
     </div>
 
 <script>
-    let currentSection = 'vacation';
-
     function showSection(sectionId) {
-        // إخفاء الكل وإظهار المختار
         document.querySelectorAll('.form-section').forEach(s => s.classList.remove('active'));
         document.getElementById(sectionId).classList.add('active');
-        
-        // تحديث الأزرار
         document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
         event.target.classList.add('active');
-        
         currentSection = sectionId;
         document.getElementById('output').style.display = 'none';
+        
+        const titles = {
+            'vacation': 'الشؤون الإدارية - الإجازة',
+            'resignation': 'الشؤون الإدارية - الاستقالة',
+            'transfer': 'الشؤون الإدارية - الانتداب',
+            'roles': 'الشؤون الإدارية - الرولات'
+        };
+        document.getElementById('mainTitle').innerText = titles[sectionId];
     }
 
+    let currentSection = 'vacation';
+
     function processData() {
-        let finalMsg = "";
         const now = new Date();
-        const d = now.toLocaleDateString('en-GB');
-        const t = now.toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' });
+        const startD = now.toLocaleDateString('en-GB');
+        const startT = now.toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' });
+
+        let finalMsg = "";
 
         if (currentSection === 'vacation') {
             const id = document.getElementById('copyID').value;
             const h = parseFloat(document.getElementById('hours').value) || 0;
             const r = parseFloat(document.getElementById('remain').value) || 0;
-            const endDate = new Date(now.getTime() + (h * 60 * 60 * 1000));
             
-            finalMsg = `***\` إجازة داخلية \`***\n***\`المسعف المحترم :\`*** <@${id}>\n***\`المــــدة :\` ${h} ساعة***\n***\`الرصيد المتبقي :\` ${r - h} ساعة***\n***من تاريخ ${d}| ${t}***\n***الى تاريخ ${endDate.toLocaleDateString('en-GB')}| ${endDate.toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' })}***\n\n***تنويه: يمنع تغيير الوظيفة قبل انتهاء المدة.***\n<@&1404535885864632340>`;
-        } 
-        else if (currentSection === 'resignation') {
+            const endDate = new Date(now.getTime() + (h * 60 * 60 * 1000));
+            const endD = endDate.toLocaleDateString('en-GB');
+            const endT = endDate.toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' });
+
+            finalMsg = `﷽\n\n***الموضوع : إجازة داخلية***\n\n***للمسعف :*** <@${id}>\n\n***\`المــــدة :\`*** ***${h} ساعة***\n\n***\`الرصيد المتبقي :\`*** ***${r - h} ساعة***\n\n\n***من الساعة : ${startT} | ${startD}***\n***إلى الساعة : ${endT} | ${endD}***\n\n ***[يرجى قراءه القوانين قبل تغيير الوظيفة](https://discord.com/channels/1404512396923375696/1404536315537526794/1463297047552725252)*** \n\n***إعتماد : <@&1404535885864632340>***`;
+        } else if (currentSection === 'resignation') {
             const id = document.getElementById('resigID').value;
             const reason = document.getElementById('resigReason').value;
-            finalMsg = `***\` طلب استقالة \`***\n***\`الموظف :\`*** <@${id}>\n***\`السبب :\`*** ${reason}\n***\`التاريخ :\`*** ${d}\n\nيرجى مراجعة الإدارة المختصة.`;
-        }
-        else {
-            finalMsg = "هذا النموذج تحت التطوير حالياً...";
+            finalMsg = `﷽\n\n***الموضوع : طلب استقالة***\n\n***الموظف :*** <@${id}>\n***السبب :*** ${reason}\n***التاريخ :*** ${startD}`;
         }
 
         const out = document.getElementById('output');
@@ -224,7 +212,7 @@
         const text = document.getElementById('output').innerText;
         if(!text) return alert("أنشئ الصيغة أولاً");
         navigator.clipboard.writeText(text);
-        alert("تم النسخ ✅");
+        alert("تم النسخ بنجاح ✅");
     }
 </script>
 
