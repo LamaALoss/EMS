@@ -89,7 +89,6 @@
             font-size: 1rem;
         }
 
-        /* تنسيق خانة المكافأة */
         .checkbox-container {
             display: flex;
             align-items: center;
@@ -193,6 +192,29 @@
                 </div>
             </div>
 
+            <div id="roles" class="form-section">
+                <div class="form-group">
+                    <label>نوع الطلب:</label>
+                    <select id="roleRequestType" onchange="toggleRoleOtherInput()">
+                        <option value="ازالة الاسم , ازاله رولات الهلال , منع توظيف 14 يوم">ازالة الاسم , ازاله رولات الهلال , منع توظيف 14 يوم</option>
+                        <option value="ازالة الاسم , ازاله رولات الهلال">ازالة الاسم , ازاله رولات الهلال (بدون منع)</option>
+                        <option value="other">أخرى</option>
+                    </select>
+                </div>
+                <div id="roleOtherGroup" class="form-group" style="display: none;">
+                    <label>اكتب نوع الطلب:</label>
+                    <input type="text" id="roleCustomRequest" placeholder="اكتب طلبك هنا">
+                </div>
+                <div class="form-group">
+                    <label>Copy ID للمسعف:</label>
+                    <input type="text" id="roleMedicID" placeholder="أدخل كوبي ايدي المسعف">
+                </div>
+                <div class="form-group">
+                    <label>وذلك بسبب:</label>
+                    <input type="text" id="roleReason" placeholder="مثال: استقالة برتبة متدرب/1">
+                </div>
+            </div>
+
             <div id="vacation" class="form-section">
                 <div class="form-group">
                     <label>أدخل Copy ID للمسعف:</label>
@@ -277,6 +299,11 @@
         document.getElementById('leaderInputGroup').style.display = isChecked ? 'block' : 'none';
     }
 
+    function toggleRoleOtherInput() {
+        const val = document.getElementById('roleRequestType').value;
+        document.getElementById('roleOtherGroup').style.display = (val === 'other') ? 'block' : 'none';
+    }
+
     function showSection(sectionId) {
         currentSection = sectionId;
         document.querySelectorAll('.form-section').forEach(s => s.classList.remove('active'));
@@ -289,7 +316,8 @@
             'vacation': 'الشؤون الإدارية - الإجازة الداخلية',
             'resignation': 'الشؤون الإدارية - الاستقالة',
             'transfer': 'الشؤون الإدارية - الانتداب الخارجي',
-            'ext-vacation': 'الشؤون الإدارية - إجازة خارجية'
+            'ext-vacation': 'الشؤون الإدارية - إجازة خارجية',
+            'roles': 'الشؤون الإدارية - طلب الرولات'
         };
         document.getElementById('mainTitle').innerText = titles[sectionId] || "الشؤون الإدارية";
         if(sectionId === 'resignation') checkResigType();
@@ -312,7 +340,22 @@
         let finalMsg = "";
         const now = new Date();
 
-        if (currentSection === 'resignation') {
+        if (currentSection === 'roles') {
+            const medicID = document.getElementById('roleMedicID').value;
+            const reason = document.getElementById('roleReason').value;
+            let requestType = document.getElementById('roleRequestType').value;
+            if (requestType === 'other') requestType = document.getElementById('roleCustomRequest').value;
+
+            finalMsg = `***السلام عليكم ورحمة الله وبركاته ,,***\n\n` +
+                       `***\`القيادة الموقرة نطلب منكم للمسعف : \` ( <@${medicID}> ) ***\n\n` +
+                       `***نوع الطلب : ( ${requestType} ) ***\n\n` +
+                       `***\`وذلك بسبب :\` ( ${reason} ) ***\n\n` +
+                       `*** للعلم مع التحية /***\n` +
+                       `<@&1404535891351048413>  \n` +
+                       `<@&1404535891376214137> \n` +
+                       `<@&1404535891401117767>`;
+        }
+        else if (currentSection === 'resignation') {
             const level = document.getElementById('resigLevel').value;
             const id = document.getElementById('resigID').value;
             const nameCode = document.getElementById('resigNameCode').value;
@@ -334,7 +377,7 @@
                 `<@${id}>\n` +
                 `${nameCode}\n\n` +
                 `\`\`\`وذلك بسبب : استقالة برتبة ${level} \`\`\`\n\n` +
-                `\`نوع السحب : \`  [فاتورة](${billUrl}) \n\n` +
+                `\`نوع السحب : \`  [فاتورة](${billUrl}) \n\n` +
                 `\`اعتماد:\` <@${signerID}>\n\n` +
                 `يرسل الاصل الى : \n` +
                 `***<@&1404535885864632340>***`;
@@ -360,8 +403,6 @@
             const id = document.getElementById('copyID_in').value;
             const leaderID = document.getElementById('leaderID_in').value;
             const dur = document.getElementById('hours_in').value || 0;
-            const rem = document.getElementById('remain_in').value || 0;
-            
             const h = parseInt(document.getElementById('manualHour').value);
             const m = parseInt(document.getElementById('manualMin').value);
             const period = document.getElementById('manualPeriod').value;
@@ -382,10 +423,7 @@
             `***إلى الساعة : ${formatT(endTime)} | ${formatD(endTime)}***\n\n` +
             ` ***[يرجى قراءه القوانين قبل تغيير الوظيفة](https://discord.com/channels/1404512396923375696/1404536315537526794/1463297047552725252)*** \n\n` +
             `***إعتماد : <@&1404535885864632340>***`;
-
-            if(isLeaderBonus) {
-                finalMsg += `\n\n***\`توقيع و اعتماد :\` <@${leaderID}>***`;
-            }
+            if(isLeaderBonus) finalMsg += `\n\n***\`توقيع و اعتماد :\` <@${leaderID}>***`;
         }
         else if (currentSection === 'transfer') {
             const id = document.getElementById('copyID_trans').value;
